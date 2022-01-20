@@ -51,8 +51,10 @@ void print_ip_h(const u_char* packet)
         printf("[!] ERROR : no TCP\n");
         return ;
     }
-    printf("[+] IP \n    src ip >> %s\n    dst ip >> %s\n",
-           inet_ntoa(iph->ip_src), inet_ntoa(iph->ip_dst));
+
+    // Why do not work 'iph->ip_dst'?
+    printf("[+] IP \n    src ip >> %s\n    dst ip >> %d.%d.%d.%d\n",
+           inet_ntoa(iph->ip_src), packet[16], packet[17], packet[18], packet[19]);
 }
 
 void print_tcp_h(const u_char* packet)
@@ -74,7 +76,7 @@ void print_data(const u_char* packet, uint32_t total_len)
     //packet + ethernet_header_len + ip_header_len + tcp_header_len
     u_char* data = (u_char*)(packet + 14 + 20 + 32);
 
-    printf("[+] DATA \n    >> ");
+    printf("[+] DATA (8 bytes) \n    >> ");
     for (int i = 0; i < 8; i++) printf("%02X ", data[i]);
     printf("\n\n");
 
