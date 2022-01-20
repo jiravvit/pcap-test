@@ -69,7 +69,7 @@ void print_data(const u_char* packet, uint32_t total_len)
 {
    if (total_len-14-20-32 == 0)
    {
-       printf("[!] ERROR : no Data\n");
+       printf("[!] ERROR : no Data\n\n");
        return ;
    }
 
@@ -84,7 +84,7 @@ void print_data(const u_char* packet, uint32_t total_len)
 
 void print_packet(const u_char* packet, uint32_t total_len)
 {
-    printf("===================================================\n");
+    printf("===================================================\n\n");
     printf("[*] Header\n");
 
     print_eth_h(packet);
