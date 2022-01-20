@@ -20,7 +20,8 @@ int main(int argc, char* argv[]) {
             printf("pcap_next_ex return %d(%s)\n", res, pcap_geterr(pcap));
             break;
         }
-        printf("%u bytes captured\n", header->caplen);
+        //printf("%u bytes captured\n", header->caplen);
+        print_packet(packet, header->caplen);
     }
 
     pcap_close(pcap);
