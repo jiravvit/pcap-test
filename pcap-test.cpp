@@ -10,7 +10,6 @@ void print_eth_h(const u_char* packet)
          return ;
      }
 
-     // print
      printf("[+] Ethernet \n    src mac >> %02x:%02x:%02x:%02x:%02x:%02x\n    dst mac >> %02x:%02x:%02x:%02x:%02x:%02x\n",
             eth->ether_shost[0],eth->ether_shost[1],eth->ether_shost[2],eth->ether_shost[3],eth->ether_shost[4], eth->ether_shost[5],
              eth->ether_dhost[0],eth->ether_dhost[1],eth->ether_dhost[2],eth->ether_dhost[3],eth->ether_dhost[4],eth->ether_dhost[5] );
@@ -39,16 +38,20 @@ void print_tcp_h(const u_char* packet)
            ntohs(tcph->th_sport), ntohs(tcph->th_dport));
 }
 
-void print_data(const u_char* packet, uint32_t total_len)
+void print_data(const u_char* packet, uint8_t tcp_offset, uint32_t total_len)
 {
-   if (total_len-14-20-32 == 0)
+   struct libnet_tcp_hdr *tcph = (struct libnet_tcp_hdr *)(packet);
+   uint8_t data_offset = tcp_offset + (tcph->th_off)*4;
+
+   //uint32_t real_data_offset = tcp_offset + data_offset;
+   if (total_len - data_offset == 0)
    {
        printf("[!] ERROR : no Data\n\n");
        return ;
    }
 
-    //packet + ethernet_header_len + ip_header_len + tcp_header_len
-    u_char* data = (u_char*)(packet + 14 + 20 + 32);
+
+    u_char* data = (u_char*)(packet + data_offset);
 
     printf("[+] DATA (8 bytes) \n    >> ");
     for (int i = 0; i < 8; i++) printf("%02X ", data[i]);
@@ -58,14 +61,18 @@ void print_data(const u_char* packet, uint32_t total_len)
 
 void print_packet(const u_char* packet, uint32_t total_len)
 {
+    uint8_t ip_offset = sizeof(struct libnet_ethernet_hdr);
+    struct libnet_ipv4_hdr *iph = (struct libnet_ipv4_hdr *)(packet + sizeof(struct libnet_ethernet_hdr));
+    uint8_t tcp_offset = ip_offset + (iph->ip_hl)*4;
+
     printf("===================================================\n\n");
     printf("[*] Header\n");
 
     print_eth_h(packet);
-    print_ip_h(packet + 14);       // Ethernet Static header size: 14 bytes
-    print_tcp_h(packet + 14 + 20); // IPv4 Static header size: 20 bytes
+    print_ip_h(packet + ip_offset);
+    print_tcp_h(packet + tcp_offset);
 
     printf("[*] Payload\n");
 
-    print_data(packet, total_len);
+    print_data(packet + tcp_offset, tcp_offset, total_len);
 }
