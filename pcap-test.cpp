@@ -38,20 +38,19 @@ void print_tcp_h(const u_char* packet)
            ntohs(tcph->th_sport), ntohs(tcph->th_dport));
 }
 
-void print_data(const u_char* packet, uint8_t tcp_offset, uint32_t total_len)
+void print_data(const u_char* packet, uint32_t tcp_offset, uint32_t total_len)
 {
-   struct libnet_tcp_hdr *tcph = (struct libnet_tcp_hdr *)(packet);
-   uint8_t data_offset = tcp_offset + (tcph->th_off)*4;
+    struct libnet_tcp_hdr *tcph = (struct libnet_tcp_hdr *)(packet);
+    uint32_t data_offset = tcp_offset + (tcph->th_off)*4;
+    //printf("%d %d\n", tcp_offset, (tcph->th_off)*4);
 
-   //uint32_t real_data_offset = tcp_offset + data_offset;
-   if (total_len - data_offset == 0)
-   {
+    if (total_len - data_offset == 0)
+    {
        printf("[!] ERROR : no Data\n\n");
        return ;
-   }
+    }
 
-
-    u_char* data = (u_char*)(packet + data_offset);
+    u_char* data = (u_char*)(packet + data_offset - 34);    // why sub 34..?
 
     printf("[+] DATA (8 bytes) \n    >> ");
     for (int i = 0; i < 8; i++) printf("%02X ", data[i]);
@@ -61,9 +60,9 @@ void print_data(const u_char* packet, uint8_t tcp_offset, uint32_t total_len)
 
 void print_packet(const u_char* packet, uint32_t total_len)
 {
-    uint8_t ip_offset = sizeof(struct libnet_ethernet_hdr);
-    struct libnet_ipv4_hdr *iph = (struct libnet_ipv4_hdr *)(packet + sizeof(struct libnet_ethernet_hdr));
-    uint8_t tcp_offset = ip_offset + (iph->ip_hl)*4;
+    uint32_t ip_offset = sizeof(struct libnet_ethernet_hdr);
+    struct libnet_ipv4_hdr *iph = (struct libnet_ipv4_hdr *)(packet + ip_offset);
+    uint32_t tcp_offset = ip_offset + (iph->ip_hl)*4;
 
     printf("===================================================\n\n");
     printf("[*] Header\n");
