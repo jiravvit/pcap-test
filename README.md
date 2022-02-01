@@ -59,8 +59,9 @@ printf("%s, %s", inet_ntoa(iph->ip_src), inet_ntoa(iph->ip_dst);
 - C언어 함수 호출 규약 : `cdecl`
 - `printf` 함수의 인자로 먼저 `inet_ntoa(iph->ip_dst)`이 들어가고, `inet_ntoa(iph->ip_src)`이 들어간다.
 - `inet_ntoa` 함수의 `buf`에는 처음에 `iph->ip_dst`가 들어갔다가 `iph->ip_src`가 들어가게 된다. 그래서 `src`가 두 번 출력이 된다.
+
 #### 해결
-- 소비를 한다.
+- [소비를 한다.](./pcap-test.cpp#L14)
     ```
     printf("%s", inet_ntoa(iph->ip_src);
     printf("%s", inet_ntoa(iph->ip_dst);
@@ -131,8 +132,10 @@ char* inet_ntoa(uint32_t n)
 - `thread`로 변수를 선언해주면, 첫번째 쓰레드가 바라보는 buf의 위치와 두번재 쓰레드가 바라보는 buf 위치가 달라짐
 - 생성자와 소멸자가 정의되어 있는 객체 내에서는 사용 금지
 
-2. 데이터 영역 출력
+## 2. 데이터 영역 출력하는 방법
+- 출력해야하는 데이터가 8byte보다 짧을 수도 있음
+- [변수 cnt 추가](./pcap-test.cpp#L33)
 
-3. 헤더 정의하기 전에 검증
+## 3. 헤더 정의하기 전에 검증
+- 중복되는 코드 없애면서 해결
 
-4. 코드 중복 없애기
